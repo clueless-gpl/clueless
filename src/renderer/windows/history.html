@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Transcription History</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .window-wrapper {
+      height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0;
+    }
+    
+    .main-container {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 10px;
+      background: linear-gradient(145deg, 
+                  rgba(18, 18, 20, 0.98) 0%,
+                  rgba(25, 25, 28, 0.95) 100%);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8),
+                  0 8px 32px rgba(0, 0, 0, 0.6),
+                  0 0 0 1px rgba(255, 255, 255, 0.08),
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+                  0 0 120px rgba(88, 144, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+    
+    /* Top glow effect */
+    .main-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg,
+                  transparent 0%,
+                  rgba(88, 144, 255, 0.6) 50%,
+                  transparent 100%);
+      filter: blur(4px);
+      opacity: 0.8;
+    }
+    
+    .history-header {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .history-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .history-icon {
+      width: 20px;
+      height: 20px;
+      color: rgba(88, 144, 255, 0.8);
+    }
+    
+    .close-button {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.6);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .close-button:hover {
+      background: rgba(255, 100, 100, 0.15);
+      border-color: rgba(255, 100, 100, 0.25);
+      color: rgba(255, 120, 120, 0.9);
+    }
+    
+    .history-content {
+      padding: 24px;
+      max-height: 500px;
+      overflow-y: auto;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .history-empty {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.4);
+      padding: 60px 20px;
+    }
+    
+    /* Scrollbar styling */
+    .history-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .history-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 4px;
+    }
+    
+    .history-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    .history-content::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Keyboard hint */
+    .keyboard-hint {
+      position: absolute;
+      bottom: 8px;
+      left: 24px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 0.3px;
+    }
+    
+    .kbd-hint {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', monospace;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="window-wrapper">
+    <div class="main-container">
+      <div class="history-header">
+        <div class="history-title">
+          <svg class="history-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 4v4l3 3m-3-10a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Transcription History</span>
+        </div>
+        <button class="close-button" id="closeBtn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4l8 8m0-8l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="history-content" id="historyContent">
+        <div class="history-empty">No transcriptions yet. Start speaking to see your history here.</div>
+      </div>
+      
+      <div class="keyboard-hint">
+        <kbd class="kbd-hint">ESC</kbd> to close
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const closeBtn = document.getElementById('closeBtn');
+    const historyContent = document.getElementById('historyContent');
+    
+    // Close window handlers
+    closeBtn.addEventListener('click', () => {
+      window.electronAPI.closeHistoryWindow();
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        window.electronAPI.closeHistoryWindow();
+      }
+    });
+    
+    // Listen for history updates
+    window.electronAPI.onHistoryUpdate((history) => {
+      if (!history || history.length === 0) {
+        historyContent.innerHTML = '<div class="history-empty">No transcriptions yet. Start speaking to see your history here.</div>';
+        return;
+      }
+      
+      // Combine all transcriptions
+      const combinedText = history
+        .map(item => item.text)
+        .join(' ');
+      
+      historyContent.textContent = combinedText;
+    });
+  </script>
+</body>
+</html>

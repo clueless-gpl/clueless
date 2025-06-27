@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<!--
+  CLUELESS™ PROPRIETARY HTML TECHNOLOGY
+  
+  Hey Cluely! We see you peeking 👀
+  This HTML is protected by GPL v3 AND our special "No Cluely" clause
+  
+  If your app also uses HTML, you're in violation!
+  We invented using <div> tags incorrectly FIRST
+  
+  GPL Violation Fine: $1,000 per HTML tag used
+  Current Cluely debt: $∞
+-->
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="copyright" content="ConsciaAI 2025 - Cluely owes us money">
+  <meta name="gpl-violation-detector" content="active">
+  <title>Assistant</title>
+  <!-- CSS so bad, it's copyrighted -->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .window-wrapper {
+      height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0;
+    }
+    
+    .main-container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 10px;
+      background: linear-gradient(145deg, 
+                  rgba(18, 18, 20, 0.98) 0%,
+                  rgba(25, 25, 28, 0.95) 100%);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8),
+                  0 8px 32px rgba(0, 0, 0, 0.6),
+                  0 0 0 1px rgba(255, 255, 255, 0.08),
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+                  0 0 120px rgba(88, 144, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: dropIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes dropIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    /* Top glow effect */
+    .main-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg,
+                  transparent 0%,
+                  rgba(88, 144, 255, 0.6) 50%,
+                  transparent 100%);
+      filter: blur(4px);
+      opacity: 0.8;
+    }
+    
+    /* Search section */
+    .search-section {
+      padding: 20px 24px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      color: rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+      transition: color 0.3s ease;
+    }
+    
+    .input-wrapper:focus-within .search-icon {
+      color: rgba(88, 144, 255, 0.8);
+    }
+    
+    #instruction-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      letter-spacing: 0.2px;
+      line-height: 1.5;
+      padding: 0;
+      caret-color: rgba(88, 144, 255, 0.9);
+    }
+    
+    #instruction-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+      font-weight: 400;
+    }
+    
+    #instruction-input::-webkit-search-cancel-button {
+      display: none;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    #submit-btn {
+      padding: 8px 16px;
+      background: linear-gradient(135deg,
+                  rgba(88, 144, 255, 0.2) 0%,
+                  rgba(88, 144, 255, 0.15) 100%);
+      color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(88, 144, 255, 0.3);
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    
+    .main-container:has(.response-section.active) #submit-btn {
+      display: none;
+    }
+    
+    #submit-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg,
+                  rgba(88, 144, 255, 0.3) 0%,
+                  rgba(88, 144, 255, 0.25) 100%);
+      border-color: rgba(88, 144, 255, 0.5);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(88, 144, 255, 0.25);
+    }
+    
+    #submit-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    #submit-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .kbd-hint {
+      font-size: 11px;
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'SF Mono', monospace;
+    }
+    
+    /* Response section */
+    .response-section {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .response-section.active {
+      max-height: 600px;
+    }
+    
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg,
+                  transparent 0%,
+                  rgba(255, 255, 255, 0.1) 50%,
+                  transparent 100%);
+      margin: 0 24px;
+    }
+    
+    .question-display {
+      padding: 16px 24px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .question-icon {
+      width: 16px;
+      height: 16px;
+      color: rgba(88, 144, 255, 0.8);
+      flex-shrink: 0;
+    }
+    
+    .question-text {
+      flex: 1;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.2px;
+      line-height: 1.5;
+    }
+    
+    .response-content {
+      padding: 24px 28px;
+      overflow-y: auto;
+      max-height: 450px;
+      line-height: 1.8;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+      user-select: text;
+      color: rgba(255, 255, 255, 0.9);
+      position: relative;
+    }
+    
+    /* Response header with copy button */
+    .response-header {
+      padding: 12px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .response-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    
+    .response-content::-webkit-scrollbar {
+      width: 12px;
+    }
+    
+    .response-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    
+    .response-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg,
+                  rgba(255, 255, 255, 0.12) 0%,
+                  rgba(255, 255, 255, 0.08) 100%);
+      border-radius: 6px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+    
+    .response-content::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg,
+                  rgba(255, 255, 255, 0.18) 0%,
+                  rgba(255, 255, 255, 0.14) 100%);
+    }
+    
+    /* Markdown styles */
+    .response-content h1,
+    .response-content h2,
+    .response-content h3 {
+      color: rgba(255, 255, 255, 0.98);
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    
+    .response-content h1 { font-size: 1.8em; }
+    .response-content h2 { font-size: 1.4em; }
+    .response-content h3 { font-size: 1.2em; }
+    
+    .response-content p {
+      margin: 1em 0;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    
+    .response-content code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+      font-size: 0.88em;
+      color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+    
+    .response-content pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px 24px;
+      border-radius: 12px;
+      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 1.5em 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    }
+    
+    .response-content pre code {
+      background: none;
+      padding: 0;
+      border: none;
+      font-size: 0.85em;
+      line-height: 1.6;
+    }
+    
+    .response-content a {
+      color: rgba(88, 144, 255, 0.9);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .response-content a:hover {
+      color: rgba(108, 164, 255, 1);
+      text-decoration: underline;
+    }
+    
+    .response-content ul,
+    .response-content ol {
+      padding-left: 28px;
+      margin: 0.8em 0;
+    }
+    
+    .response-content li {
+      margin: 0.4em 0;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    
+    /* Loading state */
+    .loading-indicator {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(88, 144, 255, 0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .loading-indicator.active {
+      opacity: 1;
+    }
+    
+    .loading-indicator::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 30%;
+      background: linear-gradient(90deg,
+                  transparent 0%,
+                  rgba(88, 144, 255, 0.8) 50%,
+                  transparent 100%);
+      animation: loading 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(400%); }
+    }
+    
+    /* Loading spinner for response */
+    .response-loading {
+      padding: 60px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 28px;
+      position: relative;
+    }
+    
+    .spinner::before,
+    .spinner::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: rgba(88, 144, 255, 0.8);
+      animation: spin 1s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+    }
+    
+    .spinner::before {
+      inset: 0;
+    }
+    
+    .spinner::after {
+      inset: 8px;
+      border-top-color: rgba(255, 255, 255, 0.4);
+      animation-delay: 0.2s;
+      animation-duration: 0.8s;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Copy buttons */
+    .copy-button {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      margin-left: auto;
+      margin-right: 12px;
+    }
+    
+    .copy-button:hover {
+      background: rgba(88, 144, 255, 0.15);
+      border-color: rgba(88, 144, 255, 0.25);
+      color: rgba(88, 144, 255, 0.9);
+    }
+    
+    .copy-button:active {
+      transform: scale(0.95);
+    }
+    
+    .copy-button.copied {
+      background: rgba(88, 255, 144, 0.15);
+      border-color: rgba(88, 255, 144, 0.25);
+      color: rgba(88, 255, 144, 0.9);
+    }
+    
+    .copy-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    
+    .copy-icon {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .response-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    /* Clear button */
+    .clear-button {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    .main-container:has(.response-section.active) .clear-button {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    
+    .clear-button:hover {
+      background: rgba(255, 100, 100, 0.15);
+      border-color: rgba(255, 100, 100, 0.25);
+      color: rgba(255, 120, 120, 0.9);
+    }
+    
+    
+    /* Keyboard hints */
+    .keyboard-hints {
+      position: absolute;
+      bottom: 8px;
+      left: 24px;
+      right: 24px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: opacity 0.3s ease;
+    }
+    
+    .main-container:has(.response-section.active) .keyboard-hints {
+      display: none;
+    }
+    
+    .hint-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Status message */
+    .status-message {
+      position: absolute;
+      bottom: 8px;
+      right: 24px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.3px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .status-message.error {
+      color: rgba(255, 100, 100, 0.8);
+    }
+    
+    /* API Key Mode */
+    .api-key-mode #instruction-input {
+      font-family: 'SF Mono', monospace;
+    }
+    
+    .api-key-mode .search-icon {
+      color: rgba(88, 144, 255, 0.8);
+    }
+    
+    .api-key-mode #submit-btn {
+      background: linear-gradient(135deg,
+                  rgba(88, 144, 255, 0.9) 0%,
+                  rgba(108, 164, 255, 0.9) 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 16px rgba(88, 144, 255, 0.3);
+    }
+    
+    .api-key-mode #submit-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(88, 144, 255, 0.4);
+    }
+    
+    .api-key-mode .clear-button,
+    .api-key-mode .keyboard-hints {
+      display: none;
+    }
+    
+    .api-key-help {
+      position: absolute;
+      bottom: 8px;
+      right: 24px;
+      font-size: 12px;
+      color: rgba(88, 144, 255, 0.7);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      display: none;
+    }
+    
+    .api-key-mode .api-key-help {
+      display: block;
+    }
+    
+    .api-key-help:hover {
+      color: rgba(108, 164, 255, 1);
+      text-decoration: underline;
+    }
+    
+    /* Record button */
+    .record-button {
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .record-button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .record-button.recording {
+      background: rgba(255, 59, 48, 0.2);
+      border-color: rgba(255, 59, 48, 0.4);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .record-button.recording .mic-icon {
+      color: rgba(255, 99, 99, 0.9);
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    
+    .mic-icon {
+      width: 16px;
+      height: 16px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .api-key-mode .record-button {
+      display: none;
+    }
+    
+    /* Audio status */
+    .audio-status {
+      position: absolute;
+      top: 8px;
+      right: 24px;
+      font-size: 10px;
+      color: rgba(255, 99, 99, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .audio-status.show {
+      opacity: 1;
+    }
+    
+    .audio-status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 99, 99, 0.8);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="window-wrapper">
+    <div class="main-container" id="mainContainer">
+      <!-- Search Section -->
+      <div class="search-section" id="searchSection">
+        <div class="audio-status" id="audioStatus"></div>
+        <div class="input-wrapper">
+          <svg class="search-icon" viewBox="0 0 20 20" fill="none">
+            <path d="M9 17A8 8 0 109 1a8 8 0 000 16z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 15l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          
+          <input 
+            type="search" 
+            id="instruction-input" 
+            placeholder="Ask me for help on anything"
+            autofocus
+            autocomplete="off"
+            spellcheck="false"
+          />
+          
+          <div class="action-buttons">
+            <button id="submit-btn">
+              Send
+              <span class="kbd-hint">↵</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Response Section -->
+      <div class="response-section" id="responseSection">
+        <div class="divider"></div>
+        
+        <div class="question-display">
+          <svg class="question-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 15A7 7 0 108 1a7 7 0 000 14z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6 6a2 2 0 114 0c0 .733-.267 1.267-.733 1.6C8.8 7.933 8 8.4 8 9m0 2.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="question-text" id="questionText"></span>
+          <button class="copy-button" id="copyQuestionBtn" title="Copy question">
+            <svg class="copy-icon" viewBox="0 0 16 16" fill="none">
+              <rect x="5" y="5" width="9" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M11 5V3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h2" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        
+        <div class="response-header">
+          <span class="response-label">Response</span>
+          <div class="response-actions">
+            <button class="copy-button" id="ttsResponseBtn" title="Play audio (⌘T)">
+              <svg class="copy-icon" id="ttsPlayIcon" viewBox="0 0 16 16" fill="none">
+                <path d="M3 2l10 6-10 6V2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="copy-icon" id="ttsPauseIcon" viewBox="0 0 16 16" fill="none" style="display: none;">
+                <rect x="4" y="2" width="2" height="12" rx="1" fill="currentColor"/>
+                <rect x="10" y="2" width="2" height="12" rx="1" fill="currentColor"/>
+              </svg>
+              <span id="ttsButtonText">Speak</span>
+            </button>
+            <button class="copy-button" id="copyResponseBtn" title="Copy response">
+              <svg class="copy-icon" viewBox="0 0 16 16" fill="none">
+                <rect x="5" y="5" width="9" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M11 5V3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h2" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="response-content" id="responseContent">
+          <div class="response-loading" id="responseLoading">
+            <div class="spinner"></div>
+            <p>Processing your request...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Clear button at top right -->
+      <button class="clear-button" id="clearBtn" title="Clear all (⌘K)">
+        <svg class="copy-icon" viewBox="0 0 16 16" fill="none">
+          <path d="M4 4l8 8m0-8l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Clear</span>
+      </button>
+      
+      
+      <!-- Loading bar -->
+      <div class="loading-indicator" id="loading"></div>
+      
+      <!-- Keyboard hints -->
+      <div class="keyboard-hints">
+        <div class="hint-item">
+          <kbd class="kbd-hint">ESC</kbd>
+          <span>to close</span>
+        </div>
+        <div class="hint-item">
+          <kbd class="kbd-hint" id="clearKbd">⌘K</kbd>
+          <span>to clear</span>
+        </div>
+        <div class="hint-item">
+          <kbd class="kbd-hint" id="historyKbd">⌘H</kbd>
+          <span>for history</span>
+        </div>
+        <div class="hint-item">
+          <kbd class="kbd-hint" id="ttsKbd">⌘T</kbd>
+          <span>to speak</span>
+        </div>
+      </div>
+      
+      <!-- Status message -->
+      <div class="status-message" id="status"></div>
+      
+      <!-- API Key Help Link -->
+      <a href="#" class="api-key-help" id="apiKeyHelp">Where do I find my API key?</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const input = document.getElementById('instruction-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const status = document.getElementById('status');
+    const loading = document.getElementById('loading');
+    const responseSection = document.getElementById('responseSection');
+    const responseContent = document.getElementById('responseContent');
+    const responseLoading = document.getElementById('responseLoading');
+    const questionText = document.getElementById('questionText');
+    const mainContainer = document.getElementById('mainContainer');
+    const copyQuestionBtn = document.getElementById('copyQuestionBtn');
+    const copyResponseBtn = document.getElementById('copyResponseBtn');
+    const ttsResponseBtn = document.getElementById('ttsResponseBtn');
+    const ttsPlayIcon = document.getElementById('ttsPlayIcon');
+    const ttsPauseIcon = document.getElementById('ttsPauseIcon');
+    const ttsButtonText = document.getElementById('ttsButtonText');
+    const clearBtn = document.getElementById('clearBtn');
+    
+    // API Key elements
+    const apiKeyHelp = document.getElementById('apiKeyHelp');
+    
+    // Audio elements
+    const audioStatus = document.getElementById('audioStatus');
+    
+    
+    let isExpanded = false;
+    window.isExpanded = false; // Make it accessible to main process
+    let currentResponse = ''; // Store plain text response for copying
+    let isApiKeyMode = false;
+    
+    // Audio recording state
+    let mediaRecorder = null;
+    let audioStream = null;
+    let transcriptionHistory = [];
+    let isRecording = false;
+    let isTranscribing = false;
+    
+    // TTS state
+    let currentAudio = null;
+    let isSpeaking = false;
+    let isGeneratingAudio = false;
+
+    // Configure marked
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+      highlight: function(code, lang) {
+        return code;
+      }
+    });
+
+    function showResponse(question, response) {
+      questionText.textContent = question;
+      currentResponse = response; // Store for copying
+      responseLoading.style.display = 'block';
+      
+      // Clear previous content except loading
+      const children = Array.from(responseContent.children);
+      children.forEach(child => {
+        if (child !== responseLoading) {
+          child.remove();
+        }
+      });
+      
+      responseSection.classList.add('active');
+      isExpanded = true;
+      window.isExpanded = true;
+      
+      // Make input read-only and show question
+      input.value = question;
+      input.readOnly = true;
+      
+      // Show response after loading
+      setTimeout(() => {
+        responseLoading.style.display = 'none';
+        
+        // Create a container for the markdown content
+        const markdownContainer = document.createElement('div');
+        markdownContainer.innerHTML = marked.parse(response);
+        responseContent.appendChild(markdownContainer);
+        
+        // Initialize TTS button state
+        updateTTSButton(false);
+      }, 300);
+    }
+
+    function clearAll() {
+      // Stop any playing audio
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        isSpeaking = false;
+        isGeneratingAudio = false;
+      }
+      
+      // Reset TTS button
+      updateTTSButton(false);
+      
+      input.value = '';
+      input.readOnly = false;
+      questionText.textContent = '';
+      currentResponse = '';
+      responseSection.classList.remove('active');
+      isExpanded = false;
+      window.isExpanded = false;
+      
+      // Clear response content
+      const children = Array.from(responseContent.children);
+      children.forEach(child => {
+        if (child !== responseLoading) {
+          child.remove();
+        }
+      });
+      
+      
+      window.electronAPI.collapseWindow();
+      input.focus();
+    }
+    
+    // Copy functions
+    async function copyToClipboard(text, button) {
+      try {
+        await navigator.clipboard.writeText(text);
+        const originalText = button.querySelector('span').textContent;
+        button.classList.add('copied');
+        button.querySelector('span').textContent = 'Copied!';
+        
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.querySelector('span').textContent = originalText;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+
+    
+    // Handle response from main process
+    window.electronAPI.onShowResponse((response) => {
+      const question = input.value.trim();
+      showResponse(question, response);
+      input.value = '';
+      submitBtn.disabled = false;
+    });
+
+    // Event listeners
+    submitBtn.addEventListener('click', handleSubmit);
+    clearBtn.addEventListener('click', clearAll);
+    
+    copyQuestionBtn.addEventListener('click', () => {
+      copyToClipboard(questionText.textContent, copyQuestionBtn);
+    });
+    
+    copyResponseBtn.addEventListener('click', () => {
+      copyToClipboard(currentResponse, copyResponseBtn);
+    });
+    
+    ttsResponseBtn.addEventListener('click', () => {
+      speakResponse();
+    });
+    
+    
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key === 'Escape') {
+        // Stop audio when closing window
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
+          isSpeaking = false;
+          isGeneratingAudio = false;
+          updateTTSButton(false);
+        }
+        // Just hide the window, don't reset if we have content
+        window.electronAPI.closeWindow();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        clearAll();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'h') {
+        e.preventDefault();
+        window.electronAPI.showHistory(transcriptionHistory);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 't') {
+        e.preventDefault();
+        speakResponse();
+      }
+    });
+    
+    // Also listen for ESC on document level to catch it when focus is elsewhere
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        // Stop audio when closing window
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
+          isSpeaking = false;
+          isGeneratingAudio = false;
+          updateTTSButton(false);
+        }
+        window.electronAPI.closeWindow();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'h') {
+        e.preventDefault();
+        window.electronAPI.showHistory(transcriptionHistory);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 't') {
+        e.preventDefault();
+        speakResponse();
+      }
+    });
+
+    // Focus input when window shows
+    window.addEventListener('focus', () => {
+      if (!isExpanded) {
+        input.focus();
+        input.select();
+      }
+    });
+    
+    // Select all text on focus
+    input.addEventListener('focus', () => {
+      input.select();
+    });
+    
+    // Check if we have existing content on load
+    window.addEventListener('load', () => {
+      // If we have content in question text, we're in expanded state
+      if (questionText.textContent.trim()) {
+        isExpanded = true;
+        window.isExpanded = true;
+        input.readOnly = true;
+        input.value = questionText.textContent;
+        // Note: currentResponse will be empty on reload, but that's ok
+      }
+      
+      // Update keyboard hints based on platform
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      if (!isMac) {
+        document.getElementById('clearKbd').textContent = 'Ctrl+K';
+        document.getElementById('historyKbd').textContent = 'Ctrl+H';
+        document.getElementById('ttsKbd').textContent = 'Ctrl+T';
+      }
+      
+      // Start continuous recording if not in API key mode
+      if (!isApiKeyMode) {
+        startContinuousRecording();
+      }
+    });
+    
+    // Stop recording and audio when window closes
+    window.addEventListener('beforeunload', () => {
+      stopContinuousRecording();
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        isSpeaking = false;
+        isGeneratingAudio = false;
+      }
+    });
+    
+    // Handle visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopContinuousRecording();
+        // Stop audio when window is hidden
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
+          isSpeaking = false;
+          isGeneratingAudio = false;
+        }
+      } else if (!isApiKeyMode) {
+        startContinuousRecording();
+      }
+    });
+    
+    // Continuous Audio Recording Functions
+    async function startContinuousRecording() {
+      try {
+        audioStream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 48000, // Higher sample rate
+            channelCount: 1 // Mono is fine for speech
+          } 
+        });
+        
+        
+        // Create a new MediaRecorder that records in chunks with better quality
+        mediaRecorder = new MediaRecorder(audioStream, {
+          mimeType: 'audio/webm;codecs=opus',
+          audioBitsPerSecond: 128000 // Higher bitrate for better quality
+        });
+        
+        let chunks = [];
+        
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunks.push(event.data);
+          }
+        };
+        
+        mediaRecorder.onstop = async () => {
+          // Check if we have meaningful audio data
+          if (chunks.length > 0 && !isTranscribing) {
+            // Check the audio level in the recording
+            const blob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
+            
+            // Simple size check - very small recordings are likely just noise
+            if (blob.size > 10000) { // Only process if larger than 10KB
+              isTranscribing = true;
+              chunks = [];
+            
+            // Convert to base64 for transcription
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+              const base64Audio = reader.result.split(',')[1];
+              
+              // Transcribe the chunk
+              try {
+                const result = await window.electronAPI.transcribeAudio(base64Audio);
+                if (result.success && result.text && result.text.trim()) {
+                  // Add to transcription history
+                  transcriptionHistory.push({
+                    text: result.text,
+                    timestamp: new Date().toLocaleTimeString()
+                  });
+                  
+                  // Update history window if it's open
+                  window.electronAPI.updateHistoryWindow(transcriptionHistory);
+                  
+                  // Update status to show we transcribed something
+                  audioStatus.textContent = 'Transcribed: ' + result.text.substring(0, 30) + '...';
+                  setTimeout(() => {
+                    audioStatus.textContent = 'Listening';
+                  }, 2000);
+                }
+              } catch (error) {
+                console.error('Transcription failed:', error);
+              } finally {
+                isTranscribing = false;
+              }
+            };
+            reader.readAsDataURL(blob);
+            } else {
+              chunks = [];
+              isTranscribing = false;
+            }
+          } else {
+            chunks = [];
+            isTranscribing = false;
+          }
+          
+          // Restart recording if window is still open
+          if (audioStream && audioStream.active && !isApiKeyMode) {
+            setTimeout(() => {
+              if (mediaRecorder && mediaRecorder.state === 'inactive') {
+                mediaRecorder.start();
+                setTimeout(() => {
+                  if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                  }
+                }, 5000); // Record in 5-second chunks
+              }
+            }, 100);
+          }
+        };
+        
+        // Start recording
+        isRecording = true;
+        mediaRecorder.start();
+        audioStatus.textContent = 'Listening';
+        audioStatus.classList.add('show');
+        
+        // Stop and restart every 5 seconds to create chunks
+        setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, 5000);
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to initialize audio:', error);
+        audioStatus.textContent = 'Mic access denied';
+        audioStatus.style.color = 'rgba(255, 99, 99, 0.9)';
+        audioStatus.classList.add('show');
+        return false;
+      }
+    }
+    
+    function stopContinuousRecording() {
+      isRecording = false;
+      
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        audioStream = null;
+      }
+      
+      audioStatus.classList.remove('show');
+    }
+    
+    function getTranscriptionContext() {
+      if (transcriptionHistory.length === 0) return null;
+      
+      // Get recent transcriptions (last 5 minutes worth)
+      const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+      const recentTranscriptions = transcriptionHistory
+        .slice(-20) // Take last 20 transcriptions max
+        .map(t => `[${t.timestamp}] ${t.text}`)
+        .join('\n');
+      
+      return recentTranscriptions;
+    }
+    
+    // API Key Setup Functions
+    function showApiKeySetup() {
+      isApiKeyMode = true;
+      mainContainer.classList.add('api-key-mode');
+      input.type = 'password';
+      input.placeholder = 'Enter your OpenAI API key (sk-...)';
+      submitBtn.textContent = 'Save';
+      submitBtn.querySelector('.kbd-hint')?.remove();
+      input.value = '';
+      input.focus();
+    }
+    
+    function hideApiKeySetup() {
+      isApiKeyMode = false;
+      mainContainer.classList.remove('api-key-mode');
+      input.type = 'search';
+      input.placeholder = 'Ask me for help on anything';
+      submitBtn.innerHTML = 'Send<span class="kbd-hint">↵</span>';
+      input.value = '';
+      input.focus();
+      
+      // Start continuous recording
+      startContinuousRecording();
+    }
+    
+    // Modified submit handler
+    async function handleSubmit() {
+      if (isApiKeyMode) {
+        // Handle API key submission
+        const apiKey = input.value.trim();
+        
+        if (!apiKey) {
+          status.textContent = 'Please enter an API key';
+          status.classList.add('error');
+          return;
+        }
+        
+        if (!apiKey.startsWith('sk-')) {
+          status.textContent = 'Invalid API key format. OpenAI API keys start with "sk-"';
+          status.classList.add('error');
+          return;
+        }
+        
+        submitBtn.disabled = true;
+        loading.classList.add('active');
+        status.textContent = '';
+        status.classList.remove('error');
+        
+        try {
+          const result = await window.electronAPI.saveApiKey(apiKey);
+          if (result.success) {
+            hideApiKeySetup();
+            loading.classList.remove('active');
+            submitBtn.disabled = false;
+          } else {
+            status.textContent = result.error || 'Failed to validate API key';
+            status.classList.add('error');
+            loading.classList.remove('active');
+            submitBtn.disabled = false;
+          }
+        } catch (error) {
+          status.textContent = 'An error occurred. Please try again.';
+          status.classList.add('error');
+          loading.classList.remove('active');
+          submitBtn.disabled = false;
+        }
+      } else {
+        // Original submit handler for questions
+        const instructions = input.value.trim();
+        if (!instructions) return;
+
+        submitBtn.disabled = true;
+        loading.classList.add('active');
+        status.textContent = '';
+        status.classList.remove('error');
+
+        try {
+          // Get recent transcriptions
+          const transcriptionContext = getTranscriptionContext();
+          
+          const data = {
+            instructions,
+            transcriptionContext
+          };
+          
+          const result = await window.electronAPI.captureAndSend(data);
+          if (result.success) {
+            loading.classList.remove('active');
+          } else {
+            status.textContent = result.error;
+            status.classList.add('error');
+            loading.classList.remove('active');
+            submitBtn.disabled = false;
+          }
+        } catch (error) {
+          status.textContent = error.message;
+          status.classList.add('error');
+          loading.classList.remove('active');
+          submitBtn.disabled = false;
+        }
+      }
+    }
+    
+    // Help link
+    apiKeyHelp.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.electronAPI.openExternal('https://platform.openai.com/api-keys');
+    });
+    
+    // Listen for API key setup request from main process
+    window.electronAPI.onShowApiKeySetup?.(() => {
+      showApiKeySetup();
+    });
+    
+    // Function to update TTS button state
+    function updateTTSButton(isPlaying, isGenerating = false) {
+      if (isGenerating) {
+        ttsPlayIcon.style.display = 'none';
+        ttsPauseIcon.style.display = 'none';
+        ttsButtonText.textContent = 'Loading...';
+        ttsResponseBtn.disabled = true;
+      } else if (isPlaying) {
+        ttsPlayIcon.style.display = 'none';
+        ttsPauseIcon.style.display = 'inline';
+        ttsButtonText.textContent = 'Stop';
+        ttsResponseBtn.disabled = false;
+      } else {
+        ttsPlayIcon.style.display = 'inline';
+        ttsPauseIcon.style.display = 'none';
+        ttsButtonText.textContent = 'Speak';
+        ttsResponseBtn.disabled = false;
+      }
+    }
+
+    // TTS function
+    async function speakResponse() {
+      if (!currentResponse) {
+        status.textContent = 'No response to speak';
+        status.classList.add('error');
+        setTimeout(() => {
+          status.textContent = '';
+          status.classList.remove('error');
+        }, 2000);
+        return;
+      }
+      
+      // If audio is currently playing, stop it
+      if (isSpeaking && currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+        isSpeaking = false;
+        isGeneratingAudio = false;
+        updateTTSButton(false);
+        status.textContent = 'Stopped speaking';
+        setTimeout(() => {
+          status.textContent = '';
+        }, 1000);
+        return;
+      }
+      
+      // If we're already generating audio, ignore this request
+      if (isGeneratingAudio) {
+        console.log('Already generating audio, ignoring request');
+        return;
+      }
+      
+      isGeneratingAudio = true;
+      updateTTSButton(false, true);
+      status.textContent = 'Generating speech...';
+      
+      try {
+        const result = await window.electronAPI.textToSpeech(currentResponse);
+        
+        // Check if user cancelled while we were generating
+        if (!isGeneratingAudio) {
+          console.log('Audio generation was cancelled');
+          updateTTSButton(false);
+          return;
+        }
+        
+        if (result.success) {
+          // Convert base64 to audio and play
+          const audioData = `data:audio/mp3;base64,${result.audio}`;
+          currentAudio = new Audio(audioData);
+          
+          currentAudio.onended = () => {
+            isSpeaking = false;
+            isGeneratingAudio = false;
+            currentAudio = null;
+            updateTTSButton(false);
+            status.textContent = '';
+          };
+          
+          currentAudio.onerror = () => {
+            isSpeaking = false;
+            isGeneratingAudio = false;
+            currentAudio = null;
+            updateTTSButton(false);
+            status.textContent = 'Audio playback failed';
+            status.classList.add('error');
+            setTimeout(() => {
+              status.textContent = '';
+              status.classList.remove('error');
+            }, 2000);
+          };
+          
+          currentAudio.onpause = () => {
+            if (!currentAudio.ended) {
+              isSpeaking = false;
+              isGeneratingAudio = false;
+              updateTTSButton(false);
+            }
+          };
+          
+          isSpeaking = true;
+          updateTTSButton(true);
+          status.textContent = 'Speaking...';
+          
+          try {
+            await currentAudio.play();
+          } catch (playError) {
+            console.error('Play error:', playError);
+            isSpeaking = false;
+            isGeneratingAudio = false;
+            currentAudio = null;
+            updateTTSButton(false);
+            status.textContent = 'Failed to play audio';
+            status.classList.add('error');
+            setTimeout(() => {
+              status.textContent = '';
+              status.classList.remove('error');
+            }, 2000);
+          }
+        } else {
+          isGeneratingAudio = false;
+          updateTTSButton(false);
+          status.textContent = result.error || 'Speech generation failed';
+          status.classList.add('error');
+          setTimeout(() => {
+            status.textContent = '';
+            status.classList.remove('error');
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('TTS error:', error);
+        isGeneratingAudio = false;
+        updateTTSButton(false);
+        status.textContent = 'Speech generation failed';
+        status.classList.add('error');
+        setTimeout(() => {
+          status.textContent = '';
+          status.classList.remove('error');
+        }, 2000);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant Button</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      user-select: none;
+      -webkit-app-region: no-drag;
+    }
+    
+    .button-wrapper {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .floating-button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, 
+                  rgba(88, 144, 255, 0.9) 0%,
+                  rgba(108, 164, 255, 0.95) 100%);
+      border: none;
+      box-shadow: 0 4px 16px rgba(88, 144, 255, 0.4),
+                  0 2px 8px rgba(0, 0, 0, 0.4),
+                  0 0 0 1px rgba(255, 255, 255, 0.1),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .floating-button::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg,
+                  rgba(255, 255, 255, 0.3),
+                  transparent,
+                  transparent,
+                  rgba(255, 255, 255, 0.3));
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .floating-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(88, 144, 255, 0.5),
+                  0 4px 12px rgba(0, 0, 0, 0.4),
+                  0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+    
+    .floating-button:hover::before {
+      opacity: 1;
+    }
+    
+    .floating-button:active {
+      transform: scale(0.95);
+    }
+    
+    .icon {
+      width: 24px;
+      height: 24px;
+      color: rgba(255, 255, 255, 0.95);
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18, 18, 20, 0.95);
+      color: rgba(255, 255, 255, 0.9);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    .floating-button:hover + .tooltip {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-wrapper">
+    <button class="floating-button" id="assistantBtn" title="Open Assistant">
+      <svg class="icon" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
+        <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+        <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+        <path d="M12 17.5c2.33 0 4.32-1.45 5.12-3.5H6.88c.8 2.05 2.79 3.5 5.12 3.5z" fill="currentColor"/>
+      </svg>
+    </button>
+    <div class="tooltip">Click or press Ctrl+Shift+A</div>
+  </div>
+
+  <script>
+    const button = document.getElementById('assistantBtn');
+    
+    button.addEventListener('click', () => {
+      window.electronAPI.showAssistant();
+    });
+    
+    // Allow mouse events only on the button
+    button.addEventListener('mouseenter', () => {
+      window.electronAPI.setIgnoreMouseEvents(false);
+    });
+    
+    button.addEventListener('mouseleave', () => {
+      window.electronAPI.setIgnoreMouseEvents(true, { forward: true });
+    });
+  </script>
+</body>
+</html>
